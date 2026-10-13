@@ -1,0 +1,27 @@
+# Core training stack. Pin majors, let patches float.
+#
+# Install PyTorch FIRST and from the right index for your hardware, because the
+# CPU and CUDA builds are different wheels:
+#   CUDA 12.1 : pip install torch --index-url https://download.pytorch.org/whl/cu121
+#   CPU only  : pip install torch --index-url https://download.pytorch.org/whl/cpu
+torch>=2.4
+
+# Data: streaming corpora from the Hugging Face Hub and the pinned tokenizer.
+datasets>=3.0
+transformers>=4.44
+huggingface-hub>=0.25
+zstandard>=0.22          # several Hub corpora ship .zst shards
+pyarrow>=16.0
+
+# Analysis and figures.
+numpy>=1.26
+pandas>=2.2
+matplotlib>=3.8
+scipy>=1.13
+
+# Config and ergonomics.
+PyYAML>=6.0
+tqdm>=4.66
+
+# Optional but recommended once the sweep gets long: run tracking.
+# wandb>=0.17

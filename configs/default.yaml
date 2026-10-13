@@ -1,0 +1,51 @@
+# Default configuration for one cell of the capacity x mixture grid.
+#
+# Command-line flags override anything here, so the sweep scripts keep this file
+# as the single source of truth for everything that must stay IDENTICAL across
+# runs (tokenizer, block size, eval budget, optimizer) and override only the
+# three things that are supposed to vary (capacity, mixture, seed).
+#
+# Start with configs/smoke.yaml to confirm the pipeline runs end to end before
+# you spend GPU hours on this one.
+
+model:
+  capacity: tiny          # tiny | small | base | medium | large
+  block_size: 512
+  vocab_size: 50304       # gpt-neox-20b vocab (50277) padded to a multiple of 64
+  dropout: 0.0            # keep at 0: dropout is itself a capacity intervention
+  tie_embeddings: true
+
+optim:
+  base_lr: 6.0e-4         # tuned at base_width; rescaled 1/width below
+  base_width: 560
+  lr_scaling: mup         # mup | constant. Use mup unless you are ablating it.
+  min_lr_ratio: 0.1
+  warmup_frac: 0.02
+  weight_decay: 0.1
+  beta1: 0.9
+  beta2: 0.95
+  grad_clip: 1.0
+
+data:
+  tokenizer: EleutherAI/gpt-neox-20b
+  mixture:
+    wiki: 1.0             # overridden per run, e.g. {code: 0.5, legal: 0.5}
+  budget_mode: per_domain # per_domain | total. per_domain is the headline setting.
+  tokens_per_domain: 50000000
+  eval_tokens_per_domain: 2000000
+  seed: 0
+  cache_dir: data_cache
+  streaming: true
+
+train:
+  batch_tokens: 65536
+  micro_batch_size: 8
+  log_every: 50
+  eval_every: 250         # dense enough to read off a token-matched comparison
+  diagnostics_every: 0
+  device: auto
+  dtype: bfloat16
+  compile_model: false
+  out_dir: runs
+  run_name: null
+  save_checkpoint: true

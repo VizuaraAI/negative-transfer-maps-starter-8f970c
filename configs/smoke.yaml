@@ -1,0 +1,48 @@
+# Tiny end-to-end smoke config: a few thousand tokens, runs on a laptop CPU in
+# a couple of minutes. The numbers it produces are meaningless. Its only job is
+# to prove the pipeline works: data streams, the model trains, evals fire,
+# result.json is written, and transfer.py can read it.
+#
+# Run this FIRST, every time you change the data or training code.
+
+model:
+  capacity: tiny
+  block_size: 128
+  vocab_size: 50304
+  dropout: 0.0
+  tie_embeddings: true
+
+optim:
+  base_lr: 1.0e-3
+  base_width: 560
+  lr_scaling: mup
+  min_lr_ratio: 0.1
+  warmup_frac: 0.1
+  weight_decay: 0.1
+  beta1: 0.9
+  beta2: 0.95
+  grad_clip: 1.0
+
+data:
+  tokenizer: EleutherAI/gpt-neox-20b
+  mixture:
+    wiki: 1.0
+  budget_mode: per_domain
+  tokens_per_domain: 40960
+  eval_tokens_per_domain: 8192
+  seed: 0
+  cache_dir: data_cache
+  streaming: true
+
+train:
+  batch_tokens: 4096
+  micro_batch_size: 4
+  log_every: 1
+  eval_every: 5
+  diagnostics_every: 0
+  device: cpu
+  dtype: float32
+  compile_model: false
+  out_dir: runs_smoke
+  run_name: null
+  save_checkpoint: true
